@@ -2,9 +2,10 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
+import { baseURL } from '../../Services/baseURL';
 
 
-function ProjectCard() {
+function ProjectCard({project}) {
     
     const [show, setShow] = useState(false);
 
@@ -13,9 +14,9 @@ function ProjectCard() {
     return (
         <>
             <Card style={{ width: '18rem' }}>
-                <Card.Img variant="top" onClick={handleShow} src="https://media.geeksforgeeks.org/wp-content/cdn-uploads/20210401151214/What-is-Website.png" />
+                <Card.Img variant="top" onClick={handleShow} src={`${baseURL}projectimage/${project.image}`} />
                 <Card.Body>
-                    <Card.Title>Website</Card.Title>
+                    <Card.Title>{project.title}</Card.Title>
                 </Card.Body>
             </Card>
 
@@ -31,23 +32,23 @@ function ProjectCard() {
                 <Modal.Body>
                     <div className="row">
                         <div className="col">
-                            <img src="https://media.geeksforgeeks.org/wp-content/cdn-uploads/20210401151214/What-is-Website.png" style={{width:"100%"}} alt="" />
+                            <img src={`${baseURL}projectimage/${project.image}`} style={{width:"100%"}} alt="" />
                         </div>
                         <div className="col">
-                            <h3>Project title</h3>
+                            <h3>{project.title}</h3>
                             <p>
                                 <span className='fw-bolder'>Description:</span>
-                                Lorem,iandae repellendu modi eos ab necessitatibus blanditiis, ipsa quae expedita quo?
+                                {project.description}
                             </p>
                             <p>
                                 <span className='fw-bolder'>Languages:</span>
-                                HTML,CSS,JS
+                                {project.languages}
                             </p>
                             <div className="d-flex justify-content-between">
-                                <a href="">
+                                <a href={project.gitrepo}>
                                     <i className="fa-brands fa-github"></i>
                                 </a>
-                                <a href="">
+                                <a href={project.demo}>
                                     <i className="fa-solid fa-link"></i>
                                 </a>
                             </div>

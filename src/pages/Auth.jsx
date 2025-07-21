@@ -1,10 +1,63 @@
-import React, { useState } from 'react'
+import React, { useState,useContext } from 'react'
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
+import { useNavigate } from 'react-router-dom';
+import { logUserApi, regUserApi } from '../../Services/allApis';
+import { toast } from 'react-toastify';
+import { authContext } from '../ContextApi/Context';
+
 
 function Auth() {
 
   const [authState, setAuthState] = useState(true)
+  const [userData, setUserData] = useState({ email: "", username: "", password: "" })
+  const nav=useNavigate()
+  const {setAuthStatus}=useContext(authContext)
+
+
+  const handleRegister = async () => {
+    console.log(userData)
+    const { username, email, password } = userData
+    if (!username || !email || !password) {
+      toast.warning("Enter Valid Inputs")
+    }
+    else {
+      const response = await regUserApi(userData)
+      console.log(response)
+      if (response.status === 201) {
+        toast.success("Registration Completed")
+        handleAuthState()
+        setUserData({
+          email: "", username: "", password: ""
+        })
+      }
+      else
+        toast.error("Something Went wrong")
+    }
+  }
+
+  const handleLogin = async () => {
+    console.log(userData)
+    const { email, password } = userData
+    if (!email || !password) {
+      toast.warning("Enter Valid Inputs")
+    }
+    else {
+      const response = await logUserApi(userData)
+      console.log(response)
+      if (response.status === 200) {
+        toast.success("Login Completed")
+        sessionStorage.setItem("token", response.data.token)
+        sessionStorage.setItem("userData",JSON.stringify({username:response.data.user,github:response.data.github,linkedin:response.data.linkedin,profile:response.data.profile}))
+        setAuthStatus(true)
+        nav('/')
+      }
+      else
+        toast.error("Something Went wrong")
+
+    }
+
+  }
 
   const handleAuthState = () => {
     setAuthState(!authState)
@@ -29,27 +82,27 @@ function Auth() {
                 </h2>
               <div className="mt-4">
                 <FloatingLabel controlId="floatingInput" label="Email address" className="mb-3" >
-                  <Form.Control type="email" placeholder="name@example.com" />
+                  <Form.Control type="email" placeholder="name@example.com" onChange={e=>setUserData({...userData,email:e.target.value})} value={userData.email}/>
                 </FloatingLabel>
                 {
                   !authState &&
                   <>
                     <FloatingLabel controlId="floatingInput" label="Username" className="mb-3" >
-                      <Form.Control type="text" placeholder="username" />
+                      <Form.Control type="text" placeholder="username" onChange={e=>setUserData({...userData,username:e.target.value})} value={userData.username}/>
                     </FloatingLabel>
                   </>
                 }
 
                 <FloatingLabel controlId="floatingPassword" label="Password">
-                  <Form.Control type="password" placeholder="Password" />
+                  <Form.Control type="password" placeholder="Password" onChange={e=>setUserData({...userData,password:e.target.value})} value={userData.password}/>
                 </FloatingLabel>
               </div>
               <div className="d-flex justify-content-between mt-5">
                 {
                   authState ?
-                    <button className='btn btn-success'>Login</button>
+                    <button className='btn btn-success' onClick={handleLogin}>Login</button>
                     :
-                    <button className='btn btn-success'>Register</button>
+                    <button className='btn btn-success' onClick={handleRegister}>Register</button>
                 }
 
                 <button className='btn btn-link' onClick={handleAuthState}>
